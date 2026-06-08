@@ -46,23 +46,21 @@ const index = async (request, response) => {
  */
 
 const show = async (request, response) => {
-    const { id } = request.idValid;
+    const id = request.idValid;
 
     try {
+        const postData = await getPostWithTags(id);
 
-        const query = "SELECT * FROM posts WHERE id = ?";
-        const [posts] = await connection.execute(query, [id]);
-
-        if (posts.length === 0) {
+        if (postData.error) {
             return response.status(404).json({
-                error: "Post non trovato",
+                error: postData.error,
                 results: null
             });
         }
 
         response.status(200).json({
             error: null,
-            results: posts[0]
+            results: postData.results
         });
 
     } catch (error) {

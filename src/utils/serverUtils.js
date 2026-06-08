@@ -132,4 +132,29 @@ const checkPostsBySlug = (posts, slug) => {
     };
 };
 
-export { validateId, checkPosts, deletePost, validatePostData, createSlug, checkPostsBySlug };
+const getPostWithTags = async (id) => {
+
+    const [posts] = await connection.execute("SELECT * FROM posts WHERE id = ?", [id]);
+
+    if (posts.length === 0) {
+        return { error: "Post non trovato", results: null };
+    }
+
+    const queryTags = `
+        SELECT t.id, t.label 
+        FROM tags t
+        JOIN post_tag pt ON t.id = pt.tag_id
+        WHERE pt.post_id = ?
+    `;
+    const [tags] = await connection.execute(queryTags, [id]);
+
+    return {
+        error: null,
+        results: {
+            ...posts[0],
+            tags: tags
+        }
+    };
+};
+
+export { validateId, checkPosts, deletePost, validatePostData, createSlug, checkPostsBySlug, getPostWithTags };
