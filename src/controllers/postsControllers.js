@@ -1,66 +1,44 @@
 import { validateId, checkPosts, deletePost, validatePostData, createSlug, checkPostsBySlug } from '../utils/serverUtils.js'
+import connection from '../data/dbBlog.js';
 
 /*
    ============================================================
    INDEX (GET)
    ============================================================
  */
-const index = (request, response) => {
-    const { name, prep_time: prepTime, slug } = request.query;
 
-    const prepTimeLimit = parseInt(prepTime);
+const index = async (request, response) => {
 
-    if (name) {
-        const cleanName = name.trim();
+    const { name, prep_time } = request.query;
+    const prepTimeLimit = parseInt(prep_time);
 
-        if (cleanName === "") {
-            response.status(400).json({
-                error: "Il nome non può essere vuoto",
-                results: null
-            });
-            return;
-        }
-
-        if (!isNaN(cleanName)) {
-            response.status(400).json({
-                error: "Il nome non può essere un numero",
-                results: null
-            });
-            return;
-        }
+    if (name && name.trim() === "") {
+        return response.status(400).json({ error: "Il nome non può essere vuoto", results: null });
     }
 
-    if (prepTime && isNaN(prepTimeLimit)) {
-        return response.status(400).json({
-            error: "Il tempo di preparazione deve essere un numero",
+    if (prep_time && isNaN(prepTimeLimit)) {
+        return response.status(400).json({ error: "Il tempo di preparazione deve essere un numero", results: null });
+    }
+
+    try {
+        const [posts] = await connection.query(`SELECT * FROM posts`);
+        if (posts.length === 0) {
+            return response.status(404).json({
+                error: "Nessun post trovato",
+                results: null
+            });
+        }
+        response.json({
+            error: null,
+            results: posts
+        });
+    } catch (error) {
+        response.status(500).json({
+            error: "Errore interno del server",
             results: null
         });
     }
-
-    const postsFiltered = posts.filter(post => {
-        if (name) {
-            const cleanName = name.trim().toLowerCase();
-            if (!post.title.toLowerCase().includes(cleanName)) return false;
-        }
-
-        if (!isNaN(prepTimeLimit)) {
-            if (post.prep_time > prepTimeLimit) return false;
-        }
-
-        return true;
-    });
-
-    if (postsFiltered.length === 0) {
-        response.status(404).json({
-            error: "Nessun post trovato",
-            results: null
-        })
-        return;
-    }
-
-    response.json(postsFiltered);
 };
-
 /*
    ============================================================
    SHOW (GET/:slug)
