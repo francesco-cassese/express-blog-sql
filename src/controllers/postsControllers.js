@@ -184,7 +184,6 @@ const destroy = async (request, response) => {
 
         return response.sendStatus(204);
     } catch (error) {
-        console.log("DETTAGLIO ERRORE:", error);
         return response.status(500).json({ error: "Errore interno durante l'eliminazione" });
     }
 };
