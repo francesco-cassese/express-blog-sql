@@ -52,10 +52,11 @@ const show = async (request, response) => {
         const postData = await getPostWithTags(id);
 
         if (postData.error) {
-            return response.status(404).json({
+            response.status(404).json({
                 error: postData.error,
                 results: null
-            });
+            })
+            return;
         }
 
         response.status(200).json({
@@ -77,36 +78,30 @@ const show = async (request, response) => {
    ============================================================
  */
 
-const store = (request, response) => {
+const store = async (request, response) => {
 
-    const validateData = request.body;
-    const { title } = request.body;
+    console.log("BODY RICEVUTO:", request.body);
+    const { title, content, image = "default.jpg" } = request.body;
 
-    let newId = 1;
-
-    if (posts.length > 0) {
-        const listaId = posts.map(post => post.id);
-        const maxId = Math.max(...listaId);
-        newId = maxId + 1;
+    if (!title || !content) {
+        response.status(400).json({ error: "Titolo e contenuto sono obbligatori" });
+        return;
     }
 
-    const slug = createSlug(title)
+    try {
+        const query = "INSERT INTO posts (title, content, image) VALUES (?, ?, ?)";
+        const [result] = await connection.execute(query, [title, content, image]);
 
-    const newPost = {
-        id: newId,
-        ...request.body,
-        slug: slug,
-        created_at: new Date().toISOString()
+        response.status(201).json({
+            message: "Post creato con successo",
+            id: result.insertId
+        });
+        return;
+    } catch (error) {
+        console.error("ERRORE NELLA STORE:", error);
+        return response.status(500).json({ error: "Errore interno durante la creazione" });
     }
-
-    posts.push(newPost);
-
-    response.status(201).json({
-        error: null,
-        message: "Post aggiunto con successo",
-        results: newPost
-    });
-}
+};
 
 /*
    ============================================================

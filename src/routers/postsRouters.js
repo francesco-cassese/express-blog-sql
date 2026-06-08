@@ -15,10 +15,10 @@ router.get('/:id', idValidator, show);
 router.post('/', [dataValidator, store])
 
 /* http://localhost:3000/:id */
-router.put('/:id', [idValidator, postExist, dataValidator, update])
+router.put('/:id', [idValidator, dataValidator, update])
 
 /* http://localhost:3000/:id */
-router.patch('/:id', [idValidator, postExist, dataValidator, modify])
+router.patch('/:id', [idValidator, dataValidator, modify])
 
 /* http://localhost:3000/:id */
 router.delete('/:id', [idValidator], destroy)

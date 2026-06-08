@@ -1,7 +1,7 @@
 import express from 'express';
 import postsRouter from './src/routers/postsRouters.js';
 import notFound from './src/middlewares/notFound.js';
-import globalError from './src/middlewares/globalError.js';
+// import globalError from './src/middlewares/globalError.js';
 
 const app = express();
 app.use(express.json());
@@ -21,7 +21,7 @@ app.use('/posts', postsRouter);
 
 app.use(notFound);
 
-app.use(globalError);
+// app.use(globalError);
 
 app.listen(SERVER_PORT, (error) => {
 

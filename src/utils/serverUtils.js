@@ -50,44 +50,24 @@ const deletePostById = async (id) => {
     return { error: null, results: "Post eliminato con successo" };
 };
 
-const validatePostData = (data, posts) => {
-    const { title, content, prep_time, } = data;
+const validatePostData = (data) => {
+    const { title, content, image } = data;
 
     if (!title || title.trim() === "") {
-        return {
-            error: "Il titolo è obbligatorio",
-            results: null
-        };
-    }
-
-    const postEsistente = posts.find(post => post.title.toLowerCase() === title.toLowerCase());
-    if (postEsistente) {
-        return {
-            error: "Esiste già un post con questo titolo",
-            results: null
-        };
+        return { error: "Il titolo è obbligatorio", results: null };
     }
 
     if (!content || content.trim() === "") {
-        return {
-            error: "Il contenuto è obbligatorio",
-            results: null
-        };
+        return { error: "Il contenuto è obbligatorio", results: null };
     }
 
-    const numPrepTime = Number(prep_time);
-    if (isNaN(numPrepTime) || numPrepTime < 0) {
-        return {
-            error: "Il tempo di preparazione deve essere un numero positivo",
-            results: null
-        };
-    }
+    if (!image || image.trim() === "") return { error: "Immagine obbligatoria", results: null };
 
     return {
         error: null,
-        results: { ...data, prep_time: numPrepTime }
+        results: { title, content, image }
     };
-}
+};
 
 const createSlug = (title) => {
     if (!title || typeof title !== 'string') {
