@@ -1,4 +1,4 @@
-import { validateId, checkPosts, deletePost, validatePostData, createSlug, checkPostsBySlug } from '../utils/serverUtils.js'
+import { validateId, checkPosts, deletePost, validatePostData, createSlug, checkPostsBySlug, getPostWithTags } from '../utils/serverUtils.js'
 import connection from '../data/dbBlog.js';
 
 /*
