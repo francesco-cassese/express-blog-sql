@@ -1,5 +1,3 @@
-import posts from "../../data/posts.js";
-
 const validateId = id => {
 
     if (!id) {

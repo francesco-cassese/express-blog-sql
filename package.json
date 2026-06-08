@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node --env-file=.env server.js",
-    "watch": "node --watch --env-file=.env server.js"
+    "watch": "node --watch --env-file=.env server.js",
+    "test": "node --env-file=.env ./data/dbBlog.js"
   },
   "keywords": [],
   "author": "",
