@@ -1,4 +1,4 @@
-import { validateId, checkPosts, deletePost, validatePostData, createSlug, checkPostsBySlug, getPostWithTags } from '../utils/serverUtils.js'
+import { validateId, checkPosts, deletePostById, validatePostData, createSlug, checkPostsBySlug, getPostWithTags } from '../utils/serverUtils.js'
 import connection from '../data/dbBlog.js';
 
 /*
@@ -172,16 +172,21 @@ const modify = (request, response) => {
    ============================================================
  */
 
-const destroy = (request, response) => {
+const destroy = async (request, response) => {
+    const id = request.idValid;
 
-    const { id } = request.post;
+    try {
+        const result = await deletePostById(id);
 
-    const index = posts.findIndex(post => post.id === id);
+        if (result.error) {
+            return response.status(404).json({ error: result.error });
+        }
 
-    posts.splice(index, 1);
-
-    response.sendStatus(204);
-    console.log(posts);
-}
+        return response.sendStatus(204);
+    } catch (error) {
+        console.log("DETTAGLIO ERRORE:", error);
+        return response.status(500).json({ error: "Errore interno durante l'eliminazione" });
+    }
+};
 
 export { index, show, store, update, modify, destroy }
