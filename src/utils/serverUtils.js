@@ -1,39 +1,25 @@
-const validateId = id => {
+import connection from "../data/dbBlog.js";
 
-    if (!id) {
-        return {
-            error: "ID mancante nella richiesta",
-            results: null
-        };
+const validateId = (id) => {
+    if (id === undefined || id === null) {
+        return { error: "ID mancante", results: null };
     }
 
-    const numId = Number(id.trim());
+    const numId = Number(String(id).trim());
 
     if (isNaN(numId)) {
-        return {
-            error: "Valore dell'id non conforme o inesistente",
-            results: null
-        };
+        return { error: "Formato ID non valido (deve essere un numero)", results: null };
     }
 
     if (!Number.isInteger(numId)) {
-        return {
-            error: "L'ID deve essere un numero intero",
-            results: null
-        };
+        return { error: "L'ID deve essere un numero intero", results: null };
     }
 
     if (numId <= 0) {
-        return {
-            error: "Non esistono elementi con id minori o uguali a zero nel sistema",
-            results: null
-        };
+        return { error: "L'ID deve essere un valore positivo e maggiore di 0", results: null };
     }
 
-    return {
-        error: null,
-        results: numId
-    };
+    return { error: null, results: numId };
 };
 
 const checkPosts = (posts, id) => {

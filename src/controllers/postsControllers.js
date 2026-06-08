@@ -41,24 +41,36 @@ const index = async (request, response) => {
 };
 /*
    ============================================================
-   SHOW (GET/:slug)
+   SHOW (GET/:id)
    ============================================================
  */
 
-const show = (request, response) => {
+const show = async (request, response) => {
+    const { id } = request.idValid;
 
-    const { slug } = request.params;
+    try {
 
-    const postFound = checkPostsBySlug(posts, slug);
+        const query = "SELECT * FROM posts WHERE id = ?";
+        const [posts] = await connection.execute(query, [id]);
 
-    if (postFound.error) {
-        return response.status(404).json(postFound);
+        if (posts.length === 0) {
+            return response.status(404).json({
+                error: "Post non trovato",
+                results: null
+            });
+        }
+
+        response.status(200).json({
+            error: null,
+            results: posts[0]
+        });
+
+    } catch (error) {
+        response.status(500).json({
+            error: "Errore interno del server",
+            results: null
+        });
     }
-
-    response.status(200).json({
-        error: null,
-        results: postFound.results
-    });
 };
 
 /*
