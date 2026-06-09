@@ -81,7 +81,7 @@ const show = async (request, response) => {
 const store = async (request, response) => {
 
     console.log("BODY RICEVUTO:", request.body);
-    const { title, content, image = "default.jpg" } = request.body;
+    const { title, content, image = "default.jpg", tags = [] } = request.body;
 
     if (!title || !content) {
         response.status(400).json({ error: "Titolo e contenuto sono obbligatori" });
@@ -92,11 +92,24 @@ const store = async (request, response) => {
         const query = "INSERT INTO posts (title, content, image) VALUES (?, ?, ?)";
         const [result] = await connection.execute(query, [title, content, image]);
 
+        const postId = result.insertId;
+
+        if (tags.length > 0) {
+
+            const queries = tags.map(tagId => {
+                const queryRelation = "INSERT INTO post_tag (post_id, tag_id) VALUES (?, ?)";
+
+                return connection.execute(queryRelation, [postId, tagId]);
+            })
+            await Promise.all(queries);
+        };
+
         response.status(201).json({
             message: "Post creato con successo",
-            id: result.insertId
+            id: postId
         });
         return;
+
     } catch (error) {
         console.error("ERRORE NELLA STORE:", error);
         return response.status(500).json({ error: "Errore interno durante la creazione" });
